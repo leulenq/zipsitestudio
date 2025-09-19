@@ -63,13 +63,13 @@ jobs:
           git add -A
           git commit -m "auto: plan + scaffold from Airtable ${RID}" || echo "No changes to commit"
           git push -u origin "${{ steps.branch.outputs.BRANCH }}" || true
-
+          
       - name: Open Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          title: Auto build for ${{ env.RID }}
-          body: Generated from Airtable record
+          title: "Auto build for ${{ env.RID }}"
+          body: "Generated from Airtable record"
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
-          commit-message: auto: plan + scaffold from Airtable ${{ env.RID }}
+          commit-message: "auto: plan + scaffold from Airtable ${{ env.RID }}"
