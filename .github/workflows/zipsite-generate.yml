@@ -60,35 +60,87 @@ jobs:
             fs.writeFileSync("plan/brand-brief.md",(b||"").trim());
           });
           '
+- name: Generate pages with GPT
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  run: |
+    mkdir -p scripts
+    cat > scripts/gen-pages.js <<'NODE'
+    (async () => {
+      const fs = require('fs');
+      const path = require('path');
 
-      - name: Generate pages with GPT
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          node -e '
-          const fs=require("fs"),path=require("path");
-          const plan=fs.readFileSync("plan/plan.md","utf8");
-          const brief=fs.readFileSync("plan/brand-brief.md","utf8");
-          const sys=`You are a Frontend Implementer. Use our Next.js App Router + Tailwind + shadcn/ui template.
-          Input: /plan/plan.md and /plan/brand-brief.md (plain text below).
-          Tasks:
-          - Generate pages under /app/(pages) according to the plan, using ONLY {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
-          - Fill props/content from the brief; add meaningful alt text; responsive nav (desktop inline, mobile hamburger).
-          - No new npm dependencies. If something is missing, add a TODO in /CHECKLIST.md.
-          Output: return JSON array of files: [{"path":"app/(pages)/index/page.tsx","content":"..."}]`;
-          const user=\`/plan/plan.md\n\${plan}\n\n/plan/brand-brief.md\n\${brief}\`;
-          const body={model:"gpt-4o-mini",messages:[{role:"system",content:sys},{role:"user",content:user}]};
-          fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${process.env.OPENAI_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify(body)})
-          .then(r=>r.json()).then(j=>{
-            const txt=j.choices?.[0]?.message?.content||"[]";
-            let arr=[]; try{arr=JSON.parse(txt);}catch(e){arr=[];}
-            const mkdirp=(p)=>fs.mkdirSync(p,{recursive:true});
-            mkdirp("app"); mkdirp("app/(pages)");
-            for(const f of arr){ const p=f.path.replace(/^\/+/,""); mkdirp(path.dirname(p)); fs.writeFileSync(p,f.content||""); }
-            mkdirp("plan"); fs.copyFileSync("plan/plan.md","plan/plan.md"); fs.copyFileSync("plan/brand-brief.md","plan/brand-brief.md");
-          });
-          '
+      // read inputs
+      const plan = fs.readFileSync('plan/plan.md', 'utf8');
+      const brief = fs.readFileSync('plan/brand-brief.md', 'utf8');
 
+      const sys = `You are a Frontend Implementer. Use our Next.js App Router + Tailwind + shadcn/ui template.
+      Input: /plan/plan.md and /plan/brand-brief.md (plain text below).
+      Tasks:
+      - Generate pages under /app/(pages) according to the plan, using ONLY {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
+      - Fill props/content from the brief; add meaningful alt text; responsive nav (desktop inline, mobile hamburger).
+      - No new npm dependencies. If something is missing, add a TODO in /CHECKLIST.md.
+      Output: return JSON array of files: [{"path":"app/(pages)/index/page.tsx","content":"..."}]`;
+
+      const user = `/plan/plan.md
+${plan}
+
+      /plan/brand-brief.md
+${brief}`;
+
+      const body = {
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: sys },
+          { role: "user", content: user }
+        ]
+      };
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`OpenAI error ${res.status}: ${t}`);
+      }
+
+      const j = await res.json();
+      const txt = j?.choices?.[0]?.message?.content ?? "[]";
+
+      let files;
+      try { files = JSON.parse(txt); }
+      catch (e) {
+        console.error("LLM did not return JSON. Content was:\n", txt);
+        files = [];
+      }
+
+      const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
+
+      mkdirp("app");
+      mkdirp("app/(pages)");
+
+      for (const f of files) {
+        if (!f?.path) continue;
+        const p = f.path.replace(/^\/+/, "");
+        mkdirp(path.dirname(p));
+        fs.writeFileSync(p, f.content ?? "");
+      }
+
+      // keep the plan files in the repo
+      mkdirp("plan");
+      // (they already exist, but ensure committed by touching)
+      fs.writeFileSync("plan/.keep", "");
+    })().catch(err => { console.error(err); process.exit(1); });
+    NODE
+
+    node scripts/gen-pages.js
+    
       - name: Create build branch
         id: branch
         run: |
