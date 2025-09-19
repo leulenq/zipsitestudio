@@ -17,7 +17,6 @@ jobs:
       contents: write
       pull-requests: write
 
-    # Resolve recordId for both manual and webhook triggers
     env:
       RID: ${{ (github.event_name == 'repository_dispatch' && github.event.client_payload.recordId) || github.event.inputs.recordId }}
 
@@ -32,60 +31,45 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      # ---- Fetch Airtable record ----
       - name: Fetch Airtable brief
+        uses: actions/github-script@v7
         env:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
           AIRTABLE_TABLE: ${{ secrets.AIRTABLE_PROJECTS_TABLE }}
           RECORD_ID: ${{ env.RID }}
-        run: |
-          mkdir -p scripts
-          cat > scripts/fetch-brief.js <<'NODE'
-          (async () => {
+        with:
+          script: |
             const fs = require('fs');
-
             const base = process.env.AIRTABLE_BASE_ID;
             const table = encodeURIComponent(process.env.AIRTABLE_TABLE);
             const rec = process.env.RECORD_ID;
-
-            if (!rec) { throw new Error("Missing RECORD_ID"); }
-
+            if (!rec) { core.setFailed('Missing RECORD_ID'); return; }
             const url = `https://api.airtable.com/v0/${base}/${table}/${rec}`;
-            const res = await fetch(url, {
-              headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` }
-            });
-            if (!res.ok) {
-              const t = await res.text();
-              throw new Error(`Airtable error ${res.status}: ${t}`);
-            }
+            const res = await fetch(url, { headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` } });
+            if (!res.ok) { core.setFailed(`Airtable ${res.status}: ${await res.text()}`); return; }
             const json = await res.json();
             fs.writeFileSync('brief.json', JSON.stringify(json, null, 2));
-          })().catch(e => { console.error(e); process.exit(1); });
-          NODE
 
-          node scripts/fetch-brief.js
-
-      - name: Plan with GPT (write /plan/*.md)
+      # ---- Plan with GPT (returns strict JSON) ----
+      - name: Plan with GPT
+        uses: actions/github-script@v7
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          mkdir -p scripts
-          cat > scripts/plan.js <<'NODE'
-          (async () => {
+        with:
+          script: |
             const fs = require('fs');
-
             const brief = JSON.parse(fs.readFileSync('brief.json','utf8'));
 
             const sys = `You are the Web Planning Lead for ZipSite Studio.
-Return ONLY JSON in this schema:
+Return ONLY JSON with this schema:
 {
-  "planMd": "markdown string for /plan/plan.md",
-  "brandBriefMd": "markdown string for /plan/brand-brief.md"
+  "planMd": "markdown for /plan/plan.md",
+  "brandBriefMd": "markdown for /plan/brand-brief.md"
 }
-Content rules:
-- In planMd include: sitemap, per-page sections with H1/H2 + bullets, component list (only {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}), SEO (title/meta/5 keywords/page), accessibility checklist.
-- In brandBriefMd include: brand voice, tone, color guidance with contrast notes, imagery guidance aligned to the client's "Imagery style".
-`;
+- planMd: sitemap, per-page sections (H1/H2 + bullets), component list (only {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}), SEO (title/meta/5 keywords/page), accessibility checklist.
+- brandBriefMd: brand voice, tone, color guidance with contrast notes, imagery guidance aligned to "Imagery style".`;
 
             const body = {
               model: "gpt-4o-mini",
@@ -98,51 +82,38 @@ Content rules:
 
             const res = await fetch("https://api.openai.com/v1/chat/completions", {
               method: "POST",
-              headers: {
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json"
-              },
+              headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type":"application/json" },
               body: JSON.stringify(body)
             });
-            if (!res.ok) {
-              const t = await res.text();
-              throw new Error(`OpenAI error ${res.status}: ${t}`);
-            }
+            if (!res.ok) { core.setFailed(`OpenAI ${res.status}: ${await res.text()}`); return; }
             const j = await res.json();
             const content = j?.choices?.[0]?.message?.content || "{}";
-            let out;
-            try { out = JSON.parse(content); }
-            catch (e) { console.error("Non-JSON from model:\n", content); throw e; }
+            let out; try { out = JSON.parse(content); } catch (e) { core.setFailed("Model did not return JSON"); return; }
 
             require('fs').mkdirSync('plan', { recursive: true });
             fs.writeFileSync('plan/plan.md', out.planMd || "# Plan\n");
             fs.writeFileSync('plan/brand-brief.md', out.brandBriefMd || "# Brand Brief\n");
-          })().catch(e => { console.error(e); process.exit(1); });
-          NODE
 
-          node scripts/plan.js
-
+      # ---- Generate pages with GPT (strict JSON) ----
       - name: Generate pages with GPT
+        uses: actions/github-script@v7
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          mkdir -p scripts
-          cat > scripts/gen-pages.js <<'NODE'
-          (async () => {
+        with:
+          script: |
             const fs = require('fs');
             const path = require('path');
-
             const plan = fs.readFileSync('plan/plan.md','utf8');
             const brief = fs.readFileSync('plan/brand-brief.md','utf8');
 
             const sys = `You are a Frontend Implementer. Use our Next.js App Router + Tailwind + shadcn/ui template.
-Return ONLY JSON in this schema:
+Return ONLY JSON:
 { "files": [ { "path": "app/(pages)/index/page.tsx", "content": "..." }, ... ] }
 Rules:
 - Create pages/components per the plan.
 - Use ONLY {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
-- Add alt text; desktop nav inline, mobile uses hamburger; avoid horizontal scroll.
-- No new npm dependencies. If something missing, include /CHECKLIST.md with TODOs.`;
+- Add alt text; desktop nav inline, mobile hamburger; avoid horizontal scroll.
+- No new npm dependencies. If something is missing, include /CHECKLIST.md with TODOs.`;
 
             const user = `/plan/plan.md
 ${plan}
@@ -161,39 +132,23 @@ ${brief}`;
 
             const res = await fetch("https://api.openai.com/v1/chat/completions", {
               method: "POST",
-              headers: {
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json"
-              },
+              headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type":"application/json" },
               body: JSON.stringify(body)
             });
-            if (!res.ok) {
-              const t = await res.text();
-              throw new Error(`OpenAI error ${res.status}: ${t}`);
-            }
+            if (!res.ok) { core.setFailed(`OpenAI ${res.status}: ${await res.text()}`); return; }
             const j = await res.json();
             const content = j?.choices?.[0]?.message?.content || '{"files":[]}';
-            let out;
-            try { out = JSON.parse(content); }
-            catch (e) { console.error("Non-JSON from model:\n", content); throw e; }
+            let out; try { out = JSON.parse(content); } catch (e) { core.setFailed("Model did not return JSON"); return; }
 
             const files = Array.isArray(out.files) ? out.files : [];
             const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
-
             for (const f of files) {
               if (!f?.path) continue;
               const p = f.path.replace(/^\/+/, "");
               mkdirp(path.dirname(p));
               fs.writeFileSync(p, f.content ?? "");
             }
-
-            // keep plan files in repo (already exist)
-            mkdirp("plan");
-            fs.writeFileSync("plan/.keep", "");
-          })().catch(e => { console.error(e); process.exit(1); });
-          NODE
-
-          node scripts/gen-pages.js
+            mkdirp("plan"); fs.writeFileSync("plan/.keep","");
 
       - name: Create build branch
         id: branch
