@@ -1,7 +1,13 @@
 name: ZipSite Generate from Airtable
+
 on:
-  workflow_dispatch:  
-  repository_dispatch:  
+  workflow_dispatch:
+    inputs:
+      recordId:
+        description: "Airtable record ID (e.g., recXXXXXXXXXXXXXX)"
+        required: true
+        type: string
+  repository_dispatch:
     types: [zipsite_generate]
 
 jobs:
@@ -10,6 +16,10 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+
+    # Resolve recordId for both manual and webhook triggers
+    env:
+      RID: ${{ (github.event_name == 'repository_dispatch' && github.event.client_payload.recordId) || github.event.inputs.recordId }}
 
     steps:
       - uses: actions/checkout@v4
@@ -27,140 +37,185 @@ jobs:
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
           AIRTABLE_TABLE: ${{ secrets.AIRTABLE_PROJECTS_TABLE }}
-          RECORD_ID: ${{ github.event.client_payload.recordId }}
+          RECORD_ID: ${{ env.RID }}
         run: |
-          node -e '
-          const https=require("https"),fs=require("fs");
-          const base=process.env.AIRTABLE_BASE_ID;
-          const table=encodeURIComponent(process.env.AIRTABLE_TABLE);
-          const rec=process.env.RECORD_ID;
-          const opts={hostname:"api.airtable.com",path:`/v0/${base}/${table}/${rec}`,headers:{Authorization:`Bearer ${process.env.AIRTABLE_API_KEY}`}};
-          https.get(opts,(res)=>{let d="";res.on("data",c=>d+=c);res.on("end",()=>fs.writeFileSync("brief.json",d));});
-          '
+          mkdir -p scripts
+          cat > scripts/fetch-brief.js <<'NODE'
+          (async () => {
+            const fs = require('fs');
+
+            const base = process.env.AIRTABLE_BASE_ID;
+            const table = encodeURIComponent(process.env.AIRTABLE_TABLE);
+            const rec = process.env.RECORD_ID;
+
+            if (!rec) { throw new Error("Missing RECORD_ID"); }
+
+            const url = `https://api.airtable.com/v0/${base}/${table}/${rec}`;
+            const res = await fetch(url, {
+              headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` }
+            });
+            if (!res.ok) {
+              const t = await res.text();
+              throw new Error(`Airtable error ${res.status}: ${t}`);
+            }
+            const json = await res.json();
+            fs.writeFileSync('brief.json', JSON.stringify(json, null, 2));
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+          node scripts/fetch-brief.js
 
       - name: Plan with GPT (write /plan/*.md)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          node -e '
-          const fs=require("fs");
-          const brief=JSON.parse(fs.readFileSync("brief.json","utf8"));
-          const sys=`You are the Web Planning Lead for ZipSite Studio. Given the brief (JSON of the Airtable fields), produce:
-          1) /plan/plan.md: sitemap, per-page sections with H1/H2 and bullets, component list (choose only from {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}), SEO (title/meta/5 keywords/page), accessibility checklist.
-          2) /plan/brand-brief.md: brand voice, tone, color guidance with contrast notes, imagery guidance aligned to "Imagery style".
-          Keep it concise and production-focused.`;
-          const user=JSON.stringify(brief);
-          const body={model:"gpt-4o-mini",messages:[{role:"system",content:sys},{role:"user",content:user}]};
-          fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{Authorization:`Bearer ${process.env.OPENAI_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify(body)})
-          .then(r=>r.json()).then(j=>{
-            const out=j.choices?.[0]?.message?.content||"";
-            require("fs").mkdirSync("plan",{recursive:true});
-            let [a,b]=out.split("/plan/brand-brief.md");
-            fs.writeFileSync("plan/plan.md",(a||"").replace(/^.*\/plan\/plan\.md\s*/s,"").trim());
-            fs.writeFileSync("plan/brand-brief.md",(b||"").trim());
-          });
-          '
-- name: Generate pages with GPT
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  run: |
-    mkdir -p scripts
-    cat > scripts/gen-pages.js <<'NODE'
-    (async () => {
-      const fs = require('fs');
-      const path = require('path');
+          mkdir -p scripts
+          cat > scripts/plan.js <<'NODE'
+          (async () => {
+            const fs = require('fs');
 
-      // read inputs
-      const plan = fs.readFileSync('plan/plan.md', 'utf8');
-      const brief = fs.readFileSync('plan/brand-brief.md', 'utf8');
+            const brief = JSON.parse(fs.readFileSync('brief.json','utf8'));
 
-      const sys = `You are a Frontend Implementer. Use our Next.js App Router + Tailwind + shadcn/ui template.
-      Input: /plan/plan.md and /plan/brand-brief.md (plain text below).
-      Tasks:
-      - Generate pages under /app/(pages) according to the plan, using ONLY {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
-      - Fill props/content from the brief; add meaningful alt text; responsive nav (desktop inline, mobile hamburger).
-      - No new npm dependencies. If something is missing, add a TODO in /CHECKLIST.md.
-      Output: return JSON array of files: [{"path":"app/(pages)/index/page.tsx","content":"..."}]`;
+            const sys = `You are the Web Planning Lead for ZipSite Studio.
+Return ONLY JSON in this schema:
+{
+  "planMd": "markdown string for /plan/plan.md",
+  "brandBriefMd": "markdown string for /plan/brand-brief.md"
+}
+Content rules:
+- In planMd include: sitemap, per-page sections with H1/H2 + bullets, component list (only {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}), SEO (title/meta/5 keywords/page), accessibility checklist.
+- In brandBriefMd include: brand voice, tone, color guidance with contrast notes, imagery guidance aligned to the client's "Imagery style".
+`;
 
-      const user = `/plan/plan.md
+            const body = {
+              model: "gpt-4o-mini",
+              response_format: { type: "json_object" },
+              messages: [
+                { role: "system", content: sys },
+                { role: "user", content: JSON.stringify(brief) }
+              ]
+            };
+
+            const res = await fetch("https://api.openai.com/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+              const t = await res.text();
+              throw new Error(`OpenAI error ${res.status}: ${t}`);
+            }
+            const j = await res.json();
+            const content = j?.choices?.[0]?.message?.content || "{}";
+            let out;
+            try { out = JSON.parse(content); }
+            catch (e) { console.error("Non-JSON from model:\n", content); throw e; }
+
+            require('fs').mkdirSync('plan', { recursive: true });
+            fs.writeFileSync('plan/plan.md', out.planMd || "# Plan\n");
+            fs.writeFileSync('plan/brand-brief.md', out.brandBriefMd || "# Brand Brief\n");
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+          node scripts/plan.js
+
+      - name: Generate pages with GPT
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          mkdir -p scripts
+          cat > scripts/gen-pages.js <<'NODE'
+          (async () => {
+            const fs = require('fs');
+            const path = require('path');
+
+            const plan = fs.readFileSync('plan/plan.md','utf8');
+            const brief = fs.readFileSync('plan/brand-brief.md','utf8');
+
+            const sys = `You are a Frontend Implementer. Use our Next.js App Router + Tailwind + shadcn/ui template.
+Return ONLY JSON in this schema:
+{ "files": [ { "path": "app/(pages)/index/page.tsx", "content": "..." }, ... ] }
+Rules:
+- Create pages/components per the plan.
+- Use ONLY {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
+- Add alt text; desktop nav inline, mobile uses hamburger; avoid horizontal scroll.
+- No new npm dependencies. If something missing, include /CHECKLIST.md with TODOs.`;
+
+            const user = `/plan/plan.md
 ${plan}
 
-      /plan/brand-brief.md
+            /plan/brand-brief.md
 ${brief}`;
 
-      const body = {
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: user }
-        ]
-      };
+            const body = {
+              model: "gpt-4o-mini",
+              response_format: { type: "json_object" },
+              messages: [
+                { role: "system", content: sys },
+                { role: "user", content: user }
+              ]
+            };
 
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
+            const res = await fetch("https://api.openai.com/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+              const t = await res.text();
+              throw new Error(`OpenAI error ${res.status}: ${t}`);
+            }
+            const j = await res.json();
+            const content = j?.choices?.[0]?.message?.content || '{"files":[]}';
+            let out;
+            try { out = JSON.parse(content); }
+            catch (e) { console.error("Non-JSON from model:\n", content); throw e; }
 
-      if (!res.ok) {
-        const t = await res.text();
-        throw new Error(`OpenAI error ${res.status}: ${t}`);
-      }
+            const files = Array.isArray(out.files) ? out.files : [];
+            const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
 
-      const j = await res.json();
-      const txt = j?.choices?.[0]?.message?.content ?? "[]";
+            for (const f of files) {
+              if (!f?.path) continue;
+              const p = f.path.replace(/^\/+/, "");
+              mkdirp(path.dirname(p));
+              fs.writeFileSync(p, f.content ?? "");
+            }
 
-      let files;
-      try { files = JSON.parse(txt); }
-      catch (e) {
-        console.error("LLM did not return JSON. Content was:\n", txt);
-        files = [];
-      }
+            // keep plan files in repo (already exist)
+            mkdirp("plan");
+            fs.writeFileSync("plan/.keep", "");
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
 
-      const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
+          node scripts/gen-pages.js
 
-      mkdirp("app");
-      mkdirp("app/(pages)");
-
-      for (const f of files) {
-        if (!f?.path) continue;
-        const p = f.path.replace(/^\/+/, "");
-        mkdirp(path.dirname(p));
-        fs.writeFileSync(p, f.content ?? "");
-      }
-
-      // keep the plan files in the repo
-      mkdirp("plan");
-      // (they already exist, but ensure committed by touching)
-      fs.writeFileSync("plan/.keep", "");
-    })().catch(err => { console.error(err); process.exit(1); });
-    NODE
-
-    node scripts/gen-pages.js
-    
       - name: Create build branch
         id: branch
         run: |
-          BR="build-${{ github.event.client_payload.recordId }}"
+          BR="build-${RID}"
           git config user.name "zipsite-bot"
           git config user.email "bot@zipsitestudio.com"
-          git checkout -b "$BR"
+          git checkout -B "$BR"
           echo "BRANCH=$BR" >> $GITHUB_OUTPUT
 
       - name: Commit files
         run: |
           git add -A
-          git commit -m "auto: plan + scaffold from Airtable ${{ github.event.client_payload.recordId }}"
-          git push -u origin "${{ steps.branch.outputs.BRANCH }}"
+          git commit -m "auto: plan + scaffold from Airtable ${RID}" || echo "No changes to commit"
+          git push -u origin "${{ steps.branch.outputs.BRANCH }}" || true
 
       - name: Open Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          title: Auto build for ${{ github.event.client_payload.recordId }}
+          title: Auto build for ${{ env.RID }}
           body: Generated from Airtable record
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
+          commit-message: auto: plan + scaffold from Airtable ${{ env.RID }}
