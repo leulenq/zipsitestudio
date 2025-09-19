@@ -1,6 +1,7 @@
 name: ZipSite Generate from Airtable
 on:
-  repository_dispatch:
+  workflow_dispatch:  
+  repository_dispatch:  
     types: [zipsite_generate]
 
 jobs:
