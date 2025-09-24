@@ -39,14 +39,14 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      - name: Plan with DeepSeek # CHANGED
+      - name: Plan with Gemini # CHANGED
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} # CHANGED
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }} # CHANGED
         run: node scripts/plan.js
 
-      - name: Generate pages with DeepSeek # CHANGED
+      - name: Generate pages with Gemini # CHANGED
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} # CHANGED
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }} # CHANGED
         run: node scripts/gen-pages.js
 
       - name: Create build branch
