@@ -39,10 +39,11 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      # --- NEW DEBUGGING STEP ADDED BELOW ---
+      # --- DEBUGGING STEP IS NOW FIXED ---
       - name: Debug API Key
         run: |
-          echo "Secret length is: ${{ nchar(secrets.GOOGLE_API_KEY) }}"
+          KEY_VAR="${{ secrets.GOOGLE_API_KEY }}"
+          echo "Secret length is: ${#KEY_VAR}"
           echo "Secret starts with: ${{ substring(secrets.GOOGLE_API_KEY, 0, 4) }}"
       # --- END OF DEBUGGING STEP ---
 
@@ -79,4 +80,4 @@ jobs:
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
-          commit-message: "auto: plan + scaffold from Airtable ${{ env.RID }}"
+          commit-message: "auto
