@@ -39,13 +39,11 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      # --- DEBUGGING STEP IS NOW FIXED ---
       - name: Debug API Key
         run: |
           KEY_VAR="${{ secrets.GOOGLE_API_KEY }}"
           echo "Secret length is: ${#KEY_VAR}"
           echo "Secret starts with: ${{ substring(secrets.GOOGLE_API_KEY, 0, 4) }}"
-      # --- END OF DEBUGGING STEP ---
 
       - name: Plan with Gemini
         env:
@@ -80,4 +78,4 @@ jobs:
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
-          commit-message: "auto
+          # commit-message line has been removed to fix the syntax error
