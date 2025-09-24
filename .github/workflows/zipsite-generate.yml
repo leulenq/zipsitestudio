@@ -13,6 +13,7 @@ on:
 jobs:
   build-from-brief:
     runs-on: ubuntu-latest
+    concurrency: build-${{ env.RID }}
     permissions:
       contents: write
       pull-requests: write
@@ -39,11 +40,41 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      - name: Debug API Key
+      - name: Validate API Keys
         run: |
-          KEY_VAR="${{ secrets.GOOGLE_API_KEY }}"
-          echo "Secret length is: ${#KEY_VAR}"
-          echo "Secret starts with: ${{ substring(secrets.GOOGLE_API_KEY, 0, 4) }}"
+          echo "Validating API keys..."
+          
+          # Check Google API Key
+          if [ -z "${{ secrets.GOOGLE_API_KEY }}" ]; then
+            echo "❌ ERROR: GOOGLE_API_KEY secret is not set"
+            exit 1
+          else
+            echo "✅ GOOGLE_API_KEY is set"
+          fi
+          
+          # Check Airtable credentials
+          if [ -z "${{ secrets.AIRTABLE_API_KEY }}" ]; then
+            echo "❌ ERROR: AIRTABLE_API_KEY secret is not set"
+            exit 1
+          else
+            echo "✅ AIRTABLE_API_KEY is set"
+          fi
+          
+          if [ -z "${{ secrets.AIRTABLE_BASE_ID }}" ]; then
+            echo "❌ ERROR: AIRTABLE_BASE_ID secret is not set"
+            exit 1
+          else
+            echo "✅ AIRTABLE_BASE_ID is set"
+          fi
+          
+          if [ -z "${{ secrets.AIRTABLE_PROJECTS_TABLE }}" ]; then
+            echo "❌ ERROR: AIRTABLE_PROJECTS_TABLE secret is not set"
+            exit 1
+          else
+            echo "✅ AIRTABLE_PROJECTS_TABLE is set"
+          fi
+          
+          echo "All API keys validated successfully"
 
       - name: Plan with Gemini
         env:
@@ -58,19 +89,24 @@ jobs:
       - name: Create build branch
         id: branch
         run: |
-          BR="build-${RID}"
+          BRANCH_NAME="build-${RID}-$(date +%s)"
           git config user.name "zipsite-bot"
           git config user.email "bot@zipsitestudio.com"
-          git checkout -B "$BR"
-          echo "BRANCH=$BR" >> $GITHUB_OUTPUT
+          git checkout -B "$BRANCH_NAME"
+          echo "BRANCH=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Commit files
         run: |
           git add -A
-          git commit -m "auto: plan + scaffold from Airtable ${RID}" || echo "No changes to commit"
-          git push -u origin "${{ steps.branch.outputs.BRANCH }}" || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "auto: plan + scaffold from Airtable ${RID}"
+            git push -u origin "${{ steps.branch.outputs.BRANCH }}"
+          fi
 
       - name: Open Pull Request
+        if: success()
         uses: peter-evans/create-pull-request@v6
         with:
           title: "Auto build for ${{ env.RID }}"
@@ -78,4 +114,4 @@ jobs:
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
-          # commit-message line has been removed to fix the syntax error
+          commit-message: "auto: plan + scaffold from Airtable ${RID}"
