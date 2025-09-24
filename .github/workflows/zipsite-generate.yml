@@ -39,14 +39,14 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      - name: Plan with GPT (write /plan/*.md)
+      - name: Plan with DeepSeek # CHANGED
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} # CHANGED
         run: node scripts/plan.js
 
-      - name: Generate pages with GPT
+      - name: Generate pages with DeepSeek # CHANGED
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }} # CHANGED
         run: node scripts/gen-pages.js
 
       - name: Create build branch
@@ -63,12 +63,12 @@ jobs:
           git add -A
           git commit -m "auto: plan + scaffold from Airtable ${RID}" || echo "No changes to commit"
           git push -u origin "${{ steps.branch.outputs.BRANCH }}" || true
-          
+
       - name: Open Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
           title: "Auto build for ${{ env.RID }}"
-          body: "Generated from Airtable record"
+          body: "Generated from Airtable record ${{ env.RID }}"
           branch: ${{ steps.branch.outputs.BRANCH }}
           base: main
           delete-branch: false
