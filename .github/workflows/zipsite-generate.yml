@@ -39,14 +39,21 @@ jobs:
           RECORD_ID: ${{ env.RID }}
         run: node scripts/fetch-brief.js
 
-      - name: Plan with Gemini # CHANGED
+      # --- NEW DEBUGGING STEP ADDED BELOW ---
+      - name: Debug API Key
+        run: |
+          echo "Secret length is: ${{ nchar(secrets.GOOGLE_API_KEY) }}"
+          echo "Secret starts with: ${{ substring(secrets.GOOGLE_API_KEY, 0, 4) }}"
+      # --- END OF DEBUGGING STEP ---
+
+      - name: Plan with Gemini
         env:
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }} # CHANGED
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: node scripts/plan.js
 
-      - name: Generate pages with Gemini # CHANGED
+      - name: Generate pages with Gemini
         env:
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }} # CHANGED
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: node scripts/gen-pages.js
 
       - name: Create build branch
