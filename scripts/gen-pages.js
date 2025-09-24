@@ -21,7 +21,7 @@ ${plan}
 ${brief}`;
 
   const body = {
-    model: "gpt-4o-mini",
+    model: "deepseek-chat", // CHANGED
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: sys },
@@ -29,15 +29,15 @@ ${brief}`;
     ]
   };
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch("https://api.deepseek.com/v1/chat/completions", { // CHANGED
     method: "POST",
-    headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type":"application/json" },
+    headers: { "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`, "Content-Type":"application/json" }, // CHANGED
     body: JSON.stringify(body)
   });
 
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`OpenAI error ${res.status}: ${t}`);
+    throw new Error(`DeepSeek error ${res.status}: ${t}`); // CHANGED
   }
 
   const j = await res.json();
@@ -45,16 +45,4 @@ ${brief}`;
   let out; try { out = JSON.parse(content); } catch { throw new Error("Model did not return JSON"); }
 
   const files = Array.isArray(out.files) ? out.files : [];
-  const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
-
-  for (const f of files) {
-    if (!f?.path) continue;
-    const p = f.path.replace(/^\/+/, "");
-    mkdirp(path.dirname(p));
-    fs.writeFileSync(p, f.content ?? "");
-  }
-
-  // keep plan files tracked
-  mkdirp("plan");
-  fs.writeFileSync("plan/.keep","");
-})().catch(e => { console.error(e); process.exit(1); });
+  const
