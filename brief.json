@@ -1,0 +1,34 @@
+{
+  "id": "recPTqypznD02tNO4",
+  "createdTime": "2025-09-24T19:22:38.000Z",
+  "fields": {
+    "Email": "natangethun@gmail.com",
+    "Company Name": "Alfa Grove",
+    "Attachment Summary": {
+      "state": "error",
+      "errorType": "emptyDependency",
+      "value": null,
+      "isStale": false
+    },
+    "Company Website": "www.alfagrove.com",
+    "Company Description": "We do home care services for elderly people is the state of Washington",
+    "Pages": [
+      "Hero",
+      "About",
+      "Testimonials",
+      "Services",
+      "Gallery",
+      "Contact",
+      "FAQs",
+      "Pricing",
+      "Map",
+      "Features"
+    ],
+    "Package": "$999 Pro ~15 pages",
+    "Pages Rough Draft": "Hero: Headline & Tour CTA\n\nAbout: Our Mission & Values\n\nPricing: Care Levels & Pricing Info\n\nFAQs: Common Questions Answered\n\nMap: Location & Directions\n\nFeatures: Amenities & Facility Highlights\n\nTestimonials: Family & Resident Reviews\n\nServices: Detailed Care Options\n\nGallery: Photo Tour of Facility\n\nContact: Form, Phone & Address",
+    "Call-to-Action": "Book",
+    "Google Analytics ID": "N/A",
+    "Deadline": "2025-09-20",
+    "Reference Name": "Natan Getahun"
+  }
+}
