@@ -4,7 +4,7 @@
   const sys = `You are the Web Planning Lead for ZipSite Studio. Return ONLY JSON in this schema: { "planMd": "...", "brandBriefMd":"..." }`;
 
   const body = {
-    model: "llama-3.1-8b-instant", // CHANGED
+    model: "llama-3.1-70b-versatile", // CHANGED
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: JSON.stringify(brief) }]
   };
