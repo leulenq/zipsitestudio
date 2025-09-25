@@ -8,7 +8,7 @@
   const user = `/plan/plan.md\n${plan}\n\n/plan/brand-brief.md\n${brief}`;
 
   const body = {
-    model: "llama3-8b-8192",
+    model: "llama3-70b-8192", // CHANGED
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
