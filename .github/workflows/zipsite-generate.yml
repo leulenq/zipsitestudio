@@ -45,10 +45,9 @@ jobs:
       - name: Generate Pages with Groq
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: node scripts/gen-pages.js
-
-      # The 'Create Build Branch' and 'Commit Files' steps have been removed.
-      # The logic is now handled by the single step below.
+        run: |
+          node scripts/gen-pages.js
+          mkdir -p components # THIS LINE WAS ADDED to ensure the directory always exists
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
