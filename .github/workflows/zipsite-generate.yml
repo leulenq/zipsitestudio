@@ -37,14 +37,14 @@ jobs:
           RECORD_ID: ${{ github.event.inputs.recordId || github.event.client_payload.recordId }}
         run: node scripts/fetch-brief.js
 
-      - name: Plan with Gemini
+      - name: Plan with Groq
         env:
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: node scripts/plan.js
 
-      - name: Generate Pages with Gemini
+      - name: Generate Pages with Groq
         env:
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: node scripts/gen-pages.js
 
       - name: Create Build Branch
