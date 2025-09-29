@@ -36,7 +36,7 @@
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
   
-  const res = await fetch("https://api.groq.com/openai/v1/chat/complain.js", {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { // CHANGED
     method: "POST",
     headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type":"application/json" },
     body: JSON.stringify(body)
@@ -45,7 +45,6 @@
   if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
   
   const j = await res.json();
-  // CHANGED: Replaced optional chaining for better compatibility
   const content = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "{}";
   const out = JSON.parse(content);
   
