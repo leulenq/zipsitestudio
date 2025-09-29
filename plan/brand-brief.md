@@ -1,11 +1,11 @@
-# Brand Brief for Alfa Grove
-## Company Description:
-Alfa Grove provides home care services for elderly people in the state of Washington.
-## Company Website:
-www.alfagrove.com
-## Reference Name:
-Natan Getahun
-## Email:
-natangethun@gmail.com
-## Company Name:
-Alfa Grove
+# Brand Voice
+- Tone: Professional, sustainable, and creative
+
+# Color Palette
+- Primary: #456F63 (green-blue, high contrast with white)
+- Secondary: #649173 (light green, medium contrast with white)
+
+# Imagery Directives
+- Use high-resolution photos of luxury landscapes and gardens
+- Include images of native Kentucky plants and sustainable practices
+- Show beautiful outdoor living spaces that are both eco-friendly and functional

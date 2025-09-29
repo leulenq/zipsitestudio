@@ -1,34 +1,55 @@
 {
-  "id": "recPTqypznD02tNO4",
-  "createdTime": "2025-09-24T19:22:38.000Z",
+  "id": "recJiIkeibQ8gvlZw",
+  "createdTime": "2025-09-29T19:53:37.000Z",
   "fields": {
-    "Email": "natangethun@gmail.com",
-    "Company Name": "Alfa Grove",
+    "Email": "leulenq@gmail.com",
+    "Company Name": "Bluegrass Gardens",
+    "Brand Assets": [
+      {
+        "id": "attcOP6D1otNLewcY",
+        "width": 287,
+        "height": 175,
+        "url": "https://v5.airtableusercontent.com/v3/u/45/45/1759190400000/DwCTdVBD2puhbOLt5lkfUg/u-qdyY6qbOXS5B-FCq5GQ3zXYoiGr50qRvg2wcJznFnuOjmA4tY4lXmVd5nTpV-Ci0wUeHiMGs5kmlASW4y6CTuAee6zzMi8wmIQfPa6lgf7zPyCTkyOcd_6KN4OJSKgenNH8QOrfp9JJ-ft7yk3EjB_y6paIi-KFTYTEP0-w84/PKgICg_tt2keqIS1wWJbKYM6mJ_E2VuZ3ptwNCjunDo",
+        "filename": "images.png",
+        "size": 3871,
+        "type": "image/png",
+        "thumbnails": {
+          "small": {
+            "url": "https://v5.airtableusercontent.com/v3/u/45/45/1759190400000/mLGVAddUWo2Xnfyl3UpUIw/DltB0YWcfwRC4eNA2uDSREXsFEfJAy8PRm6YMznJb0G14coI0nsmCqTG_WOatVpXLP5ZnsL2VH6VqJQBlBS4_7bf1tOsWm8rPhlZ8wnyZxDVc30P1916N2u0nBDHCbX-6gVe5jDmiQLxwF3mqfvwXw/nou6fRFTTH9s4jOOb3YVAg4nldCbM-rzxFUihrvHaRY",
+            "width": 59,
+            "height": 36
+          },
+          "large": {
+            "url": "https://v5.airtableusercontent.com/v3/u/45/45/1759190400000/hoVtKAVH0P81JUOf0yp3ew/6kc9I21pDJT2REUwbG-7fV0vbPjMLniXPm_HEVEMhHm866s9fmxjcMQQTgDLvAXo2LoEWWsqZ_BYz9gDeSGgr3m73_0UKN9Zbr5tayubCA6nZsSQNGF8wUdu1V0KpM-5Z6yoIu4YeLtcPlQjH2I8ww/Sb8hy3aCJV-gZN33W8uUcjlqA3Ut5Qd0EKmJTFz8SU8",
+            "width": 287,
+            "height": 175
+          },
+          "full": {
+            "url": "https://v5.airtableusercontent.com/v3/u/45/45/1759190400000/cXpkfBnbA_SXL3HrrTJhzw/e6YJgL_dabiv4Stk7QOigHWnP9zghfOVzVZ-iB04GYfqH66OgncK41o0ipmtgqsJHKvxNyrAp0d8pvhGXKKZOhBGa0ZDyiqCJRBU0LmuYhmobkDHk1fC2onvTA3HRead7xH5uA2lKH6PWWQhuQMCZQ/ppD1j2NwMMZBd4Zrt3NIb-Xb-pe5c7aMK1L0IQ-MCug",
+            "width": 287,
+            "height": 175
+          }
+        }
+      }
+    ],
     "Attachment Summary": {
       "state": "error",
-      "errorType": "emptyDependency",
+      "errorType": "unsupportedAttachmentType",
       "value": null,
       "isStale": false
     },
-    "Company Website": "www.alfagrove.com",
-    "Company Description": "We do home care services for elderly people is the state of Washington",
+    "Company Description": "We are a premium, full-service landscaping and garden design company based in Lexington, KY. ",
     "Pages": [
       "Hero",
-      "About",
-      "Testimonials",
       "Services",
-      "Gallery",
+      "About",
       "Contact",
-      "FAQs",
-      "Pricing",
-      "Map",
-      "Features"
+      "Pricing"
     ],
-    "Package": "$999 Pro ~15 pages",
-    "Pages Rough Draft": "Hero: Headline & Tour CTA\n\nAbout: Our Mission & Values\n\nPricing: Care Levels & Pricing Info\n\nFAQs: Common Questions Answered\n\nMap: Location & Directions\n\nFeatures: Amenities & Facility Highlights\n\nTestimonials: Family & Resident Reviews\n\nServices: Detailed Care Options\n\nGallery: Photo Tour of Facility\n\nContact: Form, Phone & Address",
-    "Call-to-Action": "Book",
-    "Google Analytics ID": "N/A",
-    "Deadline": "2025-09-20",
-    "Reference Name": "Natan Getahun"
+    "Package": "$499 Standard ~5 pages",
+    "Pages Rough Draft": "Hero:\n\n        Headline: \"Bespoke Garden Design for the Bluegrass Region\"\n\n        Sub-headline: \"We combine timeless craftsmanship with sustainable practices to create outdoor spaces you'll love for a lifetime.\"\n\n        Button (CTA): \"Request a Free Consultation\"\n\n    Introduction (Who We Are):\n\n        A brief intro to Bluegrass Gardens as Lexington's premier landscaping design firm.\n\n        Mention our focus on high-end residential and commercial properties.\n\n        Emphasize our meticulous attention to detail and bespoke designs.\n\n    Services Overview (What We Do):\n\n        A small section with 3-4 icons and short descriptions for our main services.\n\n        Garden Design\n\n        Hardscaping (Patios & Walkways)\n\n        Lawn Maintenance\n\n        Link to the full Services page.\n\n    Portfolio Showcase:\n\n        A grid of 4-6 stunning, high-resolution photos from our best projects.\n\n        Headline: \"Our Signature Work\"\n\n        Button: \"View Our Full Portfolio\"\n\n    Testimonial:\n\n        A quote from a happy client. e.g., \"Bluegrass Gardens transformed our backyard into a true oasis. Their professionalism and artistic vision were second to none.\" - The Johnson Family, Lexington.\n\n    Final CTA Section:\n\n        Headline: \"Ready to Create Your Dream Outdoor Space?\"\n\n        Button: \"Request a Free Consultation\"\n\n## About Us Page\n\n    Our Story:\n\n        Founded by Sarah Chen, a Lexington native with a passion for Kentucky's natural beauty.\n\n        Started with a vision to bring sustainable, artistic landscape design to the Bluegrass.\n\n        Grown from a small operation to a trusted name in local luxury landscaping.\n\n    Our Philosophy:\n\n        We believe in sustainable practices that work in harmony with the local environment.\n\n        We specialize in using native Kentucky plants that thrive in our climate.\n\n        Our mission is to create beautiful spaces that are both eco-friendly and easy to maintain.\n\n    Meet the Founder:\n\n        A short professional bio and photo of Sarah Chen.\n\n        Mention her degree in Horticulture and years of experience in landscape architecture.\n\n## Services Page\n\n    Introduction:\n\n        Headline: \"Our Comprehensive Landscaping Services\"\n\n        A short paragraph explaining that we offer everything from initial design to long-term maintenance.\n\n    Garden Design:\n\n        On-site consultation to understand your vision and property.\n\n        Custom 3D design mockups.\n\n        Expert selection of plants, trees, and flowers tailored to your space.\n\n        Professional installation.\n\n    Hardscaping (Patios & Walkways):\n\n        Design and installation of elegant stone patios, walkways, and retaining walls.\n\n        Use of high-quality materials like natural flagstone and classic brick.\n\n        Focus on creating functional and beautiful outdoor living areas.\n\n    Lawn & Grounds Maintenance:\n\n        Premium maintenance plans for residential and commercial properties.\n\n        Services include precision mowing, fertilization, aeration, and seasonal cleanup.\n\n    Seasonal Planting & Color:\n\n        Design and installation of vibrant seasonal flower beds.\n\n        Container and planter arrangements for patios and entryways.\n\n## Portfolio Page\n\n    Headline: \"A Gallery of Our Finest Work\"\n\n    Photo Grid:\n\n        A large gallery of our best project photos.\n\n        Each photo should be high-resolution and expandable.\n\n        Include captions for each project (e.g., \"Historic Lexington Estate Garden,\" \"Modern Downtown Courtyard,\" \"Chevy Chase Poolside Patio\").\n\n    Filterable Categories:\n\n        Allow users to filter the gallery by project type: Residential, Commercial, and Hardscaping.\n\n## Contact Us Page\n\n    Headline: \"Let's Create Your Dream Garden\"\n\n    Contact Information:\n\n        Phone: (859) 555-0123\n\n        Email: consult@bluegrassgardens.fake\n\n        Service Area: Lexington, KY and all surrounding counties.\n\n    Contact Form:\n\n        A simple form with fields for: Full Name, Email, Phone Number, and a message box for \"Tell us about your project.\"\n\n        Button: \"Submit Request\"\n\n    Map:\n\n        An embedded Google Map showing our primary service area around Lexington.\n\n    Business Hours:\n\n        Monday - Friday: 8:00 AM - 5:00 PM",
+    "Call-to-Action": "Call",
+    "Deadline": "2025-10-01",
+    "Reference Name": "leo"
   }
 }
