@@ -12,12 +12,19 @@
 <RULES>
 - **Rule 0 (Project Folder):** CRITICAL: All generated file paths MUST be placed inside a root folder named 'sites/${projectSlug}/'. For example, 'app/page.tsx' must become 'sites/${projectSlug}/app/page.tsx'.
 - **Rule 1 (File Structure):** All reusable React components MUST be placed in the 'sites/${projectSlug}/components/' directory. The 'sites/${projectSlug}/app/' directory should ONLY contain page and layout files.
-- **Rule 2 (Client Components):** CRITICAL: At the very top of any file that uses React Hooks, you MUST include the "use client"; directive.
-- **Rule 3 (Links):** CRITICAL: The Next.js <Link> component does NOT need an <a> tag nested inside it.
+- **Rule 2 (Client Components):** CRITICAL: To make a component a Client Component, you MUST add the string literal "use client"; at the very top of the file, BEFORE any imports. It is NOT an import from React (e.g., NOT 'import { use client }...').
+- **Rule 3 (Links):** CRITICAL: The Next.js <Link> component renders its own <a> tag. Do NOT nest an extra <a> tag inside a <Link> component.
 - **Rule 4 (HTML Entities):** CRITICAL: All apostrophes in text content within JSX must be escaped as '&apos;'.
 - **Rule 5 (Image Optimization):** All images must use the Next.js '<Image />' component, imported from 'next/image'. Do NOT use the standard HTML '<img>' tag.
 - **Rule 6 (Code Cleanliness):** Ensure there are no unused imports or variables.
-</RULES>`;
+</RULES>
+<EXAMPLE_OUTPUT>
+{
+  "files": [
+    { "path": "sites/example-project/components/ContactForm.tsx", "content": "'use client';\\nimport { useState } from 'react';\\nexport default function ContactForm() { const [state, setState] = useState(''); return <p>Let&apos;s talk!</p>; }" }
+  ]
+}
+</EXAMPLE_OUTPUT>`;
 
   const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>`;
 
@@ -36,7 +43,6 @@
   if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
   
   const j = await res.json();
-  // CHANGED: Replaced optional chaining for better compatibility
   const content = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '{"files":[]}';
   const out = JSON.parse(content);
 
