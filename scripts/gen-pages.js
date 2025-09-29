@@ -26,7 +26,7 @@
   const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>`;
 
   const body = {
-    model: "llama-3.1-70b-versatile",
+    model: "llama-3.3-70b-versatile",
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
