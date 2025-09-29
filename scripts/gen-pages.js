@@ -16,6 +16,8 @@
 - **Rule 5 (Image Optimization):** All images must use the Next.js '<Image />' component, imported from 'next/image'. Do NOT use the standard HTML '<img>' tag. You can assume a placeholder size, e.g., width={500} height={300}.
 - **Rule 6 (Code Cleanliness):** Ensure there are no unused imports or variables in the final code.
 - **Rule 7 (General):** Each file path must be relative to the repo root. Use only the component names provided in the plan. Add alt text for all images.
+- **Rule 8 (Dependencies):** If you use any third-party libraries (like 'framer-motion' or '@fortawesome/react-fontawesome'), you MUST create an additional file named 'dependencies.json' that lists the required npm packages.
+  The format should be: { "dependencies": ["package-one", "package-two"] }
 </RULES>
 <EXAMPLE_OUTPUT>
 {
