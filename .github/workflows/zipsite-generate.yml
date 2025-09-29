@@ -42,6 +42,9 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: node scripts/plan.js
 
+      - name: List files in plan directory
+        run: ls -R plan
+
       - name: Generate Pages with Groq
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -49,7 +52,6 @@ jobs:
           node scripts/gen-pages.js
           mkdir -p components
 
-      # --- NEW STEP ADDED BELOW ---
       - name: Install AI-Generated Dependencies
         run: |
           if [ -f "dependencies.json" ]; then
@@ -63,8 +65,7 @@ jobs:
           else
             echo "No dependencies.json file found, skipping step."
           fi
-          
-# --- NEW STEP ADDED BELOW ---
+      
       - name: Run QA Agent
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
