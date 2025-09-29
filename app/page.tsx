@@ -1,27 +1,19 @@
+import React from 'react';
+import Hero from './hero';
+import FeatureCards from './feature-cards';
+import Testimonials from './testimonials';
+import Contact from './contact';
+import Layout from './layout';
 
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { Hero, About, Testimonials, Services, Gallery, Contact, FAQs, Pricing, Map, Features } from '../components';
-
-const Home: NextPage = () => {
+const HomePage = () => {
   return (
-    <div>
-      <Head>
-        <title>Alfa Grove - Home Care Services for Elderly People in Washington</title>
-        <meta name='description' content='Alfa Grove provides home care services for elderly people in the state of Washington.' />
-      </Head>
+    <Layout>
       <Hero />
-      <About />
+      <FeatureCards />
       <Testimonials />
-      <Services />
-      <Gallery />
       <Contact />
-      <FAQs />
-      <Pricing />
-      <Map />
-      <Features />
-    </div>
+    </Layout>
   );
 };
 
-export default Home;
+export default HomePage;
