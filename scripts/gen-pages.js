@@ -1,27 +1,26 @@
+
+    
 (async () => {
   const fs = require('fs');
   const path = require('path');
   const plan = fs.readFileSync('plan/plan.md','utf8');
   const brief = fs.readFileSync('plan/brand-brief.md','utf8');
   
-  // THE PROMPT IS NOW UPDATED WITH THE WORD "JSON"
-  const sys = `<TASK>You are a Frontend Implementer using Next.js App Router and Tailwind CSS. Your goal is to generate all required code files for the website based on the provided plan. You must return ONLY a single, valid JSON object.</TASK>
+  const sys = `<TASK>You are an expert Frontend Implementer for Next.js 14+ (App Router). You must return ONLY a single, valid JSON object and nothing else.</TASK>
 <OUTPUT_FORMAT>
 { "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }
 </OUTPUT_FORMAT>
 <RULES>
-- Each file path must be relative to the repo root and valid.
-- Use ONLY components from this list: {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
-- Add alt text for all images, use next/image format, and ensure responsive layouts.
-- Desktop nav should be inline; mobile nav should use a hamburger menu. Avoid horizontal scroll.
+- **Rule 1 (File Structure):** All reusable React components (Hero, About, Contact, etc.) MUST be placed in a 'components/' directory. The 'app/' directory should ONLY contain main page and layout files like 'page.tsx' and 'layout.tsx'.
+- **Rule 2 (Client Components):** CRITICAL: At the very top of any component file that uses React Hooks like 'useState' or 'useEffect', you MUST include the "use client"; directive.
+- **Rule 3 (Links):** CRITICAL: The Next.js <Link> component renders its own <a> tag. Do NOT nest an extra <a> tag inside a <Link> component.
+- **Rule 4 (General):** Each file path must be relative to the repo root. Use only the component names provided in the plan. Add alt text for all images and ensure responsive layouts.
 </RULES>
 <EXAMPLE_OUTPUT>
 {
   "files": [
-    {
-      "path": "app/page.tsx",
-      "content": "import React from 'react';\\n\\nconst HomePage = () => {\\n  return <div>Hello World</div>;\\n};\\n\\nexport default HomePage;"
-    }
+    { "path": "app/page.tsx", "content": "import Component from '../components/Component'; export default function Page() { return <Component />; }" },
+    { "path": "components/InteractiveForm.tsx", "content": "'use client'; import { useState } from 'react'; export default function InteractiveForm() { const [state, setState] = useState(''); return <input />; }" }
   ]
 }
 </EXAMPLE_OUTPUT>`;
@@ -34,25 +33,4 @@
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type":"application/json" },
-    body: JSON.stringify(body)
-  });
-  
-  if (!res.ok) throw new Error(`Groq error ${status}: ${await res.text()}`);
-  
-  const j = await res.json();
-  const content = j?.choices?.[0]?.message?.content || '{"files":[]}';
-  const out = JSON.parse(content);
-
-  const files = Array.isArray(out.files) ? out.files : [];
-  const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
-  for (const f of files) {
-    if (!f?.path) continue;
-    const p = f.path.replace(/^\/+/, "");
-    mkdirp(path.dirname(p));
-    fs.writeFileSync(p, f.content ?? "");
-  }
-  console.log("Wrote generated files using Groq:", files.map(f=>f.path));
-})().catch(e => { console.error(e); process.exit(1); });
+  const res
