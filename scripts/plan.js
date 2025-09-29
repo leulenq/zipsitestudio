@@ -1,9 +1,23 @@
 (async () => {
   const fs = require('fs');
   const briefData = JSON.parse(fs.readFileSync('brief.json', 'utf8'));
-
-  // Step 1: Extract and clean up the relevant data from Airtable
   const fields = briefData.fields;
+
+  // Step 1: Automatically generate the project slug from the company name
+  const companyName = fields['Company name'] || 'default-project';
+  const projectSlug = companyName
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')       // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
+    .replace(/\-\-+/g, '-');      // Replace multiple - with single -
+  
+  // Save the generated slug for the next script to use
+  fs.mkdirSync('plan', { recursive: true });
+  fs.writeFileSync('plan/slug.txt', projectSlug);
+
+  // Step 2: Create a clean brief for the AI
   const cleanBrief = `
     Company Name: ${fields['Company name'] || 'Not provided'}
     Company Description: ${fields['Company description'] || 'Not provided'}
@@ -16,7 +30,6 @@
     Pages Rough Draft: ${fields['Pages rough draft'] || 'Not provided'}
   `;
 
-  // Step 2: Use the clean brief in the prompt
   const sys = `<TASK>You are the Web Planning Lead for ZipSite Studio. You must return ONLY a single, valid JSON object.</TASK>
 <OUTPUT_FORMAT>
 {
@@ -47,10 +60,9 @@
   if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
   
   const j = await res.json();
-  const content = j?.choices?.[0]?.message?.content || "{}";
+  const content = j?.choices?[0]?.message?.content || "{}";
   const out = JSON.parse(content);
   
-  fs.mkdirSync('plan', { recursive: true });
   fs.writeFileSync('plan/plan.md', out.planMd || "# Plan\n");
   fs.writeFileSync('plan/brand-brief.md', out.brandBriefMd || "# Brand Brief\n");
   console.log("Wrote plan files using Groq.");
