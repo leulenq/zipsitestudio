@@ -30,10 +30,40 @@
     Pages Rough Draft: ${fields['Pages rough draft'] || 'Not provided'}
   `;
 
-  // Step 4: Define the AI prompt and call the API
-  const sys = `<TASK>You are the Web Planning Lead... You must return ONLY a single, valid JSON object.</TASK>...`; // (Keeping this brief for clarity, the full prompt is in the code)
-  const user = `<CLIENT_BRIEF>${cleanBrief}</CLIENT_BRIEF>`;
+  const sys = `<TASK>You are the Web Planning Lead for ZipSite Studio. You must return ONLY a single, valid JSON object.</TASK>
+<OUTPUT_FORMAT>
+{
+  "planMd": "A detailed markdown-formatted project plan.",
+  "brandBriefMd": "A detailed markdown-formatted brand brief."
+}
+</OUTPUT_FORMAT>
+<RULES>
+- Base your response entirely on the user-provided Client Brief.
+- planMd: Create a sitemap, per-page sections with H1/H2 and bullet points, a list of required components, and SEO guidance.
+- brandBriefMd: Define the brand voice, tone, a color palette, and guidance on imagery.
+</RULES>`;
+
+  const user = `<CLIENT_BRIEGF>${cleanBrief}</CLIENT_BRIEGF>`;
   
   const body = {
     model: "llama-3.3-70b-versatile",
-    response_format:
+    response_format: { type: "json_object" },
+    messages: [{ role: "system", content: sys }, { role: "user", content: user }]
+  };
+  
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type":"application/json" },
+    body: JSON.stringify(body)
+  });
+  
+  if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
+  
+  const j = await res.json();
+  const content = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "{}";
+  const out = JSON.parse(content);
+  
+  fs.writeFileSync('plan/plan.md', out.planMd || "# Plan\n");
+  fs.writeFileSync('plan/brand-brief.md', out.brandBriefMd || "# Brand Brief\n");
+  console.log("Wrote plan files using Groq.");
+})().catch(e => { console.error(e); process.exit(1); });
