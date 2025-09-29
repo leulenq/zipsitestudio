@@ -1,0 +1,1 @@
+export default function AboutSection() { return ( <div> <h1>About Us</h1> <p>Company History</p> <p>Team</p> </div> ); }

@@ -1,0 +1,1 @@
+export default function PricingTable() { return ( <table> <thead> <tr> <th>Package</th> <th>Price</th> <th>Features</th> </tr> </thead> <tbody> <tr> <td>Package 1</td> <td>$10</td> <td>Features</td> </tr> <tr> <td>Package 2</td> <td>$20</td> <td>Features</td> </tr> </tbody> </table> ); }

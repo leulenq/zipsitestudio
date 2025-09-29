@@ -1,15 +1,1 @@
-import React from 'react';
-import Nav from './nav';
-import Footer from './footer';
-
-const Layout = ({ children }) => {
-  return (
-    <>
-      <Nav />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
-};
-
-export default Layout;
+import NavigationBar from '../components/NavigationBar'; import Footer from '../components/Footer'; export default function RootLayout({ children }) { return ( <html> <head> <title>Company</title> </head> <body> <NavigationBar /> <main>{children}</main> <Footer /> </body> </html> ); }

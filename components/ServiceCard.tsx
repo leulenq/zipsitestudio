@@ -1,0 +1,1 @@
+export default function ServiceCard({ title, description, benefits }) { return ( <div> <h2>{title}</h2> <p>{description}</p> <p>Benefits: {benefits}</p> </div> ); }
