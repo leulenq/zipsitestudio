@@ -3,21 +3,6 @@
   const briefData = JSON.parse(fs.readFileSync('brief.json', 'utf8'));
   const fields = briefData.fields;
 
-  // Step 1: Automatically generate the project slug from the company name
-  const companyName = fields['Company name'] || 'default-project';
-  const projectSlug = companyName
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')       // Replace spaces with -
-    .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
-    .replace(/\-\-+/g, '-');      // Replace multiple - with single -
-  
-  // Save the generated slug for the next script to use
-  fs.mkdirSync('plan', { recursive: true });
-  fs.writeFileSync('plan/slug.txt', projectSlug);
-
-  // Step 2: Create a clean brief for the AI
   const cleanBrief = `
     Company Name: ${fields['Company name'] || 'Not provided'}
     Company Description: ${fields['Company description'] || 'Not provided'}
@@ -46,12 +31,12 @@
   const user = `<CLIENT_BRIEF>${cleanBrief}</CLIENT_BRIEF>`;
   
   const body = {
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-70b-versatile",
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
   
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/complain.js", {
     method: "POST",
     headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type":"application/json" },
     body: JSON.stringify(body)
@@ -60,9 +45,11 @@
   if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
   
   const j = await res.json();
-  const content = j?.choices?[0]?.message?.content || "{}";
+  // CHANGED: Replaced optional chaining for better compatibility
+  const content = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "{}";
   const out = JSON.parse(content);
   
+  fs.mkdirSync('plan', { recursive: true });
   fs.writeFileSync('plan/plan.md', out.planMd || "# Plan\n");
   fs.writeFileSync('plan/brand-brief.md', out.brandBriefMd || "# Brand Brief\n");
   console.log("Wrote plan files using Groq.");
