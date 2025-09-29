@@ -47,7 +47,22 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           node scripts/gen-pages.js
-          mkdir -p components # THIS LINE WAS ADDED to ensure the directory always exists
+          mkdir -p components
+
+      # --- NEW STEP ADDED BELOW ---
+      - name: Install AI-Generated Dependencies
+        run: |
+          if [ -f "dependencies.json" ]; then
+            echo "Found dependencies.json, installing packages..."
+            PACKAGES=$(jq -r '.dependencies | join(" ")' dependencies.json)
+            if [ -n "$PACKAGES" ]; then
+              npm install $PACKAGES
+            else
+              echo "No packages listed in dependencies.json."
+            fi
+          else
+            echo "No dependencies.json file found, skipping step."
+          fi
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -57,6 +72,9 @@ jobs:
             components/
             plan/
             brief.json
+            dependencies.json
+            package.json
+            package-lock.json
           commit-message: "auto: plan + scaffold from Airtable record"
           branch: "build-${{ github.event.inputs.recordId || github.event.client_payload.recordId }}"
           delete-branch: true
