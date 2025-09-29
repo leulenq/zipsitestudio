@@ -1,21 +1,15 @@
 # Brand Voice
-* Professional
-* Friendly
+- Professional
+- Friendly
 
 # Brand Tone
-* approachable
-* informative
+- Approachable
+- Informative
 
 # Color Palette
-* Primary Color: #3498db
-* Secondary Color: #f1c40f
-* Background Color: #ffffff
+- Primary color: #0047AB
+- Secondary color: #8e24aa
 
 # Imagery Guidance
-* Use high-quality images
-* Opt for a minimalistic style
-* Ensure images are relevant to the content
-
-# Key Messaging
-* Emphasize the 'Call' call-to-action
-* Highlight the importance of contacting the company
+- Use high-quality images
+- Incorporate abstract backgrounds

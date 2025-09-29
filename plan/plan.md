@@ -1,58 +1,47 @@
 # Sitemap
-* Hero
-* Services
-* About
-* Contact
-* Pricing
+- Hero
+- Services
+- About
+- Contact
+- Pricing
 
-## Hero Page
-### Introduction
-* Company Overview
-* Key Services
-### Call to Action
-* Contact Information
+## Per-Page Sections
+### Hero
+- H1: Introducing our services
+- H2: Get in touch
+- Bullet points:
+  - Our mission
+  - Our values
+### Services
+- H1: Our Services
+- H2: What we offer
+- Bullet points:
+  - Service 1
+  - Service 2
+### About
+- H1: About us
+- H2: Our story
+- Bullet points:
+  - Our team
+  - Our history
+### Contact
+- H1: Get in touch
+- H2: Contact us
+- Bullet points:
+  - Phone number
+  - Email
+### Pricing
+- H1: Our pricing
+- H2: Plans
+- Bullet points:
+  - Plan 1
+  - Plan 2
 
-## Services Page
-### Service 1
-* Description
-* Benefits
-### Service 2
-* Description
-* Benefits
+## Required Components
+- Navigation bar
+- Footer
+- Call-to-action buttons
 
-## About Page
-### Company History
-* Year Founded
-* Milestones
-### Team
-* Member 1
-* Member 2
-
-## Contact Page
-### Address
-* Street
-* City
-* State
-* Zip
-### Phone
-* Number
-
-## Pricing Page
-### Package 1
-* Price
-* Features
-### Package 2
-* Price
-* Features
-
-# Required Components
-* Navigation Bar
-* Footer
-* Contact Form
-* Services Grid
-* About Section
-* Pricing Table
-
-# SEO Guidance
-* Use keywords in page titles and headings
-* Optimize images with alt tags and descriptions
+## SEO Guidance
+- Use keywords in page titles and headings
+- Optimize images with alt tags
