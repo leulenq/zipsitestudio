@@ -1,0 +1,1 @@
+'use client'; import { useState } from 'react'; export default function ContactForm() { const [state, setState] = useState(''); return ( <form> <input type='text' placeholder='Name' /> <input type='email' placeholder='Email' /> <textarea placeholder='Message'></textarea> <button>Send</button> </form> ); }

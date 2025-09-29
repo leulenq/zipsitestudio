@@ -1,0 +1,1 @@
+import ServiceCard from './ServiceCard'; export default function ServicesGrid() { return ( <div> <ServiceCard title='Service 1' description='Description' benefits='Benefits' /> <ServiceCard title='Service 2' description='Description' benefits='Benefits' /> </div> ); }
