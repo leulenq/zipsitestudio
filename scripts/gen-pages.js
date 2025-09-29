@@ -34,4 +34,22 @@
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}`, "Content-Type":"application/json" },
-    body: JSON.stringify(body
+    body: JSON.stringify(body)
+  });
+  
+  if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
+  
+  const j = await res.json();
+  const content = j?.choices?.[0]?.message?.content || '{"files":[]}';
+  const out = JSON.parse(content);
+
+  const files = Array.isArray(out.files) ? out.files : [];
+  const mkdirp = (p) => fs.mkdirSync(p, { recursive: true });
+  for (const f of files) {
+    if (!f?.path) continue;
+    const p = f.path.replace(/^\/+/, "");
+    mkdirp(path.dirname(p));
+    fs.writeFileSync(p, f.content ?? "");
+  }
+  console.log("Wrote generated files using Groq:", files.map(f=>f.path));
+})().catch(e => { console.error(e); process.exit(1); });
