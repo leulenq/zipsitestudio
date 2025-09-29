@@ -4,7 +4,8 @@
   const plan = fs.readFileSync('plan/plan.md','utf8');
   const brief = fs.readFileSync('plan/brand-brief.md','utf8');
   
-  const sys = `<TASK>You are a Frontend Implementer using Next.js App Router and Tailwind CSS. Your goal is to generate all required code files for the website based on the provided plan.</TASK>
+  // THE PROMPT IS NOW UPDATED WITH THE WORD "JSON"
+  const sys = `<TASK>You are a Frontend Implementer using Next.js App Router and Tailwind CSS. Your goal is to generate all required code files for the website based on the provided plan. You must return ONLY a single, valid JSON object.</TASK>
 <OUTPUT_FORMAT>
 { "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }
 </OUTPUT_FORMAT>
@@ -39,7 +40,7 @@
     body: JSON.stringify(body)
   });
   
-  if (!res.ok) throw new Error(`Groq error ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Groq error ${status}: ${await res.text()}`);
   
   const j = await res.json();
   const content = j?.choices?.[0]?.message?.content || '{"files":[]}';
