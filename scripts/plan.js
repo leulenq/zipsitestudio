@@ -1,12 +1,26 @@
 (async () => {
   const fs = require('fs');
   const brief = JSON.parse(fs.readFileSync('brief.json','utf8'));
-  const sys = `You are the Web Planning Lead for ZipSite Studio. Return ONLY JSON in this schema: { "planMd": "...", "brandBriefMd":"..." }`;
 
+  const sys = `<TASK>You are the Web Planning Lead for ZipSite Studio. You must return ONLY a single, valid JSON object.</TASK>
+<OUTPUT_FORMAT>
+{
+  "planMd": "...",
+  "brandBriefMd":"..."
+}
+</OUTPUT_FORMAT>
+<RULES>
+- planMd: sitemap (pages list), per-page sections (H1/H2 + 4-6 bullets), component list (only {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}), SEO (title/meta/5 keywords/page), accessibility checklist (alt, contrast, focus order).
+- brandBriefMd: brand voice (tone), short color palette with hex values and contrast notes, imagery directives.
+- Keep content implementation-ready and concise.
+</RULES>`;
+
+  const user = `<CLIENT_BRIEF>${JSON.stringify(brief)}</CLIENT_BRIEF>`;
+  
   const body = {
-    model: "llama-3.3-70b-versatile", // CHANGED
+    model: "llama-3.1-70b-versatile",
     response_format: { type: "json_object" },
-    messages: [{ role: "system", content: sys }, { role: "user", content: JSON.stringify(brief) }]
+    messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
   
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
