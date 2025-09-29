@@ -31,7 +31,7 @@
   const user = `<CLIENT_BRIEF>${cleanBrief}</CLIENT_BRIEF>`;
   
   const body = {
-    model: "llama-3.1-70b-versatile",
+    model: "llama-3.3-70b-versatile",
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
