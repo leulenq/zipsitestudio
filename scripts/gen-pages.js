@@ -3,12 +3,32 @@
   const path = require('path');
   const plan = fs.readFileSync('plan/plan.md','utf8');
   const brief = fs.readFileSync('plan/brand-brief.md','utf8');
-  const sys = `You are a Frontend Implementer for Next.js. Return ONLY JSON: { "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }`;
+  
+  const sys = `<TASK>You are a Frontend Implementer using Next.js App Router and Tailwind CSS. Your goal is to generate all required code files for the website based on the provided plan.</TASK>
+<OUTPUT_FORMAT>
+{ "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }
+</OUTPUT_FORMAT>
+<RULES>
+- Each file path must be relative to the repo root and valid.
+- Use ONLY components from this list: {Hero, FeatureCards, Pricing, Testimonials, FAQ, Contact, Footer, Nav}.
+- Add alt text for all images, use next/image format, and ensure responsive layouts.
+- Desktop nav should be inline; mobile nav should use a hamburger menu. Avoid horizontal scroll.
+</RULES>
+<EXAMPLE_OUTPUT>
+{
+  "files": [
+    {
+      "path": "app/page.tsx",
+      "content": "import React from 'react';\\n\\nconst HomePage = () => {\\n  return <div>Hello World</div>;\\n};\\n\\nexport default HomePage;"
+    }
+  ]
+}
+</EXAMPLE_OUTPUT>`;
 
-  const user = `/plan/plan.md\n${plan}\n\n/plan/brand-brief.md\n${brief}`;
+  const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>`;
 
   const body = {
-    model: "llama-3.3-70b-versatile", // CHANGED
+    model: "llama-3.1-70b-versatile",
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
