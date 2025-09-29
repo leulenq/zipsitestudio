@@ -9,16 +9,19 @@
 { "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }
 </OUTPUT_FORMAT>
 <RULES>
-- **Rule 1 (File Structure):** All reusable React components (Hero, About, Contact, etc.) MUST be placed in a 'components/' directory. The 'app/' directory should ONLY contain main page and layout files like 'page.tsx' and 'layout.tsx'.
-- **Rule 2 (Client Components):** CRITICAL: At the very top of any component file that uses React Hooks like 'useState' or 'useEffect', you MUST include the "use client"; directive.
+- **Rule 1 (File Structure):** All reusable React components MUST be placed in a 'components/' directory. The 'app/' directory should ONLY contain 'page.tsx' and 'layout.tsx'.
+- **Rule 2 (Client Components):** CRITICAL: At the very top of any file that uses React Hooks like 'useState' or 'useEffect', you MUST include the "use client"; directive.
 - **Rule 3 (Links):** CRITICAL: The Next.js <Link> component renders its own <a> tag. Do NOT nest an extra <a> tag inside a <Link> component.
-- **Rule 4 (General):** Each file path must be relative to the repo root. Use only the component names provided in the plan. Add alt text for all images and ensure responsive layouts.
+- **Rule 4 (HTML Entities):** CRITICAL: All apostrophes in text content within JSX must be escaped. For example, "let's" must be written as "let&apos;s".
+- **Rule 5 (Image Optimization):** All images must use the Next.js '<Image />' component, imported from 'next/image'. Do NOT use the standard HTML '<img>' tag. You can assume a placeholder size, e.g., width={500} height={300}.
+- **Rule 6 (Code Cleanliness):** Ensure there are no unused imports or variables in the final code.
+- **Rule 7 (General):** Each file path must be relative to the repo root. Use only the component names provided in the plan. Add alt text for all images.
 </RULES>
 <EXAMPLE_OUTPUT>
 {
   "files": [
-    { "path": "app/page.tsx", "content": "import Component from '../components/Component'; export default function Page() { return <Component />; }" },
-    { "path": "components/InteractiveForm.tsx", "content": "'use client'; import { useState } from 'react'; export default function InteractiveForm() { const [state, setState] = useState(''); return <input />; }" }
+    { "path": "app/page.tsx", "content": "import Image from 'next/image'; export default function Page() { return <Image src='/hero.jpg' alt='hero' width={500} height={300} />; }" },
+    { "path": "components/ContactForm.tsx", "content": "'use client'; import { useState } from 'react'; export default function ContactForm() { const [state, setState] = useState(''); return <p>Let&apos;s talk!</p>; }" }
   ]
 }
 </EXAMPLE_OUTPUT>`;
