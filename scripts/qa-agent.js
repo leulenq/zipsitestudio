@@ -27,25 +27,25 @@
   
   if (fs.existsSync(siteDir)) readFilesRecursively(siteDir);
 
-  const sys = `<TASK>You are an expert QA Engineer... Return ONLY a single, valid JSON object.</TASK>
+  const sys = `<TASK>You are an expert QA Engineer for ZipSite Studio. Your task is to meticulously review the provided website code against the original Plan and Brand Brief. You must identify any bugs, inconsistencies, or deviations from the requirements. Return ONLY a single, valid JSON object.</TASK>
 <OUTPUT_FORMAT>
 {
   "issues_found": true,
-  "report": "A markdown-formatted list of all issues found...",
-  "score": "A score from 1-10..."
+  "report": "A markdown-formatted list of all issues found. Be specific. If no issues are found, this should be an empty string.",
+  "score": "A score from 1-10 on how well the code matches the plan."
 }
 </OUTPUT_FORMAT>
 <RULES>
 - Check if all pages and components from the plan were created.
 - Check for code quality issues like unused variables or incorrect component usage.
-- Verify that the code structure follows all rules from the original prompt.
+- Verify that the code structure follows all rules from the original prompt (e.g., 'use client', correct <Link> usage, etc.).
 - If the code is perfect, return "issues_found": false, an empty "report", and a "score" of 10.
 </RULES>`;
 
   const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>\n\n<GENERATED_CODE>\n${generatedCode}\n</GENERATED_CODE>`;
 
   const body = {
-    model: "openai/gpt-oss-120b",
+    model: "openai/gpt-oss-120b", // CHANGED
     response_format: { type: "json_object" },
     messages: [{ role: "system", content: sys }, { role: "user", content: user }]
   };
@@ -56,8 +56,12 @@
     body: JSON.stringify(body)
   });
 
-  if (!res.ok) throw new Error(`Groq error (QA Agent) ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new error(`Groq error (QA Agent) ${res.status}: ${await res.text()}`);
   
   const j = await res.json();
-  // CHANGED: Replaced optional chaining for better compatibility
   const content = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '{"issues_found":true, "report":"Error parsing AI response."}';
+  
+  fs.writeFileSync('plan/qa-report.json', JSON.stringify(JSON.parse(content), null, 2));
+  console.log("Wrote qa-report.json using Groq.");
+
+})().catch(e => { console.error(e); process.exit(1); });
