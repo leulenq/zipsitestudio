@@ -74,8 +74,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           add-paths: |
-            app/
-            components/
+            sites/
             plan/
             brief.json
             dependencies.json
