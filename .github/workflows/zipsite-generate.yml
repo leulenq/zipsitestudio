@@ -49,6 +49,17 @@ jobs:
           node scripts/gen-pages.js
           mkdir -p components
 
+      # --- NEW DEBUG STEP ADDED BELOW ---
+      - name: Display AI-Generated Dependencies
+        if: always() # Ensures this step runs even if a previous one fails
+        run: |
+          if [ -f "dependencies.json" ]; then
+            echo "Contents of dependencies.json:"
+            cat dependencies.json
+          else
+            echo "dependencies.json not found."
+          fi
+
       - name: Install AI-Generated Dependencies
         run: |
           if [ -f "dependencies.json" ]; then
