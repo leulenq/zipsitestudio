@@ -10,21 +10,14 @@
 { "files": [ { "path": "app/page.tsx", "content": "..." }, ... ] }
 </OUTPUT_FORMAT>
 <RULES>
-- **Rule 0 (Project Folder):** CRITICAL: All generated file paths MUST be placed inside a root folder named 'sites/${projectSlug}/'. For example, 'app/page.tsx' must become 'sites/${projectSlug}/app/page.tsx'.
-- **Rule 1 (File Structure):** All reusable React components MUST be placed in the 'sites/${projectSlug}/components/' directory. The 'sites/${projectSlug}/app/' directory should ONLY contain page and layout files.
-- **Rule 2 (Client Components):** CRITICAL: To make a component a Client Component, you MUST add the string literal "use client"; at the very top of the file, BEFORE any imports. It is NOT an import from React (e.g., NOT 'import { use client }...').
+- **Rule 1 (File Structure):** All reusable React components MUST be placed in a 'sites/${projectSlug}/components/' directory. The 'sites/${projectSlug}/app/' directory should ONLY contain page and layout files.
+- **Rule 2 (Client Components):** CRITICAL: The "use client" directive MUST be the string literal "use client"; on the very first line of any file that uses React Hooks. It is NOT an import. DO NOT write 'import { use client } from "react";'.
 - **Rule 3 (Links):** CRITICAL: The Next.js <Link> component renders its own <a> tag. Do NOT nest an extra <a> tag inside a <Link> component.
 - **Rule 4 (HTML Entities):** CRITICAL: All apostrophes in text content within JSX must be escaped as '&apos;'.
 - **Rule 5 (Image Optimization):** All images must use the Next.js '<Image />' component, imported from 'next/image'. Do NOT use the standard HTML '<img>' tag.
 - **Rule 6 (Code Cleanliness):** Ensure there are no unused imports or variables.
-</RULES>
-<EXAMPLE_OUTPUT>
-{
-  "files": [
-    { "path": "sites/example-project/components/ContactForm.tsx", "content": "'use client';\\nimport { useState } from 'react';\\nexport default function ContactForm() { const [state, setState] = useState(''); return <p>Let&apos;s talk!</p>; }" }
-  ]
-}
-</EXAMPLE_OUTPUT>`;
+- **Rule 7 (Dependencies):** If you use any third-party libraries (like '@fortawesome/react-fontawesome'), you MUST create an additional file named 'dependencies.json' listing the required npm packages.
+</RULES>`;
 
   const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>`;
 
