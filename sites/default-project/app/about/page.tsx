@@ -1,22 +1,10 @@
-"use client";
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import CallToAction from '../components/CallToAction';
-import Image from 'next/image';
+use client;
 
-export default function About() {
+export default function AboutPage() {
   return (
-    <div>
-      <Navbar />
-      <h1>About us</h1>
-      <h2>Our story</h2>
-      <ul>
-        <li>Our team</li>
-        <li>Our history</li>
-      </ul>
-      <CallToAction />
-      <Image src="/image3.jpg" alt="Abstract background" width={400} height={300} />
-      <Footer />
-    </div>
+    <section>
+      <h1>About Us</h1>
+      <p>We are a team of dedicated professionals.</p>
+    </section>
   );
 }
