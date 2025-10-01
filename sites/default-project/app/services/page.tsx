@@ -1,10 +1,14 @@
 use client;
-import ServicesSection from '../../../components/ServicesSection';
 
-export default function Services() {
+export default function ServicesPage() {
   return (
     <>
-      <ServicesSection />
+      <h1>Services</h1>
+      <p>We offer two main services:</p>
+      <ul>
+        <li>Service 1</li>
+        <li>Service 2</li>
+      </ul>
     </>
   );
 }

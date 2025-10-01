@@ -1,11 +1,11 @@
 # Brand Brief
 ## Brand Voice
-* Professional and friendly, assuming a standard tone due to lack of information
+To be determined based on company description and brand tone
 ## Brand Tone
-* Approachable and helpful
+To be determined based on company description and brand style
 ## Color Palette
-* Primary Color: #3498db
-* Secondary Color: #f1c40f
+* Primary Color: #212121
+* Secondary Color: #484848
+* Accent Color: #03A9F4
 ## Imagery Guidance
-* Use high-quality, relevant images
-* Opt for a consistent visual style throughout the site
+Use high-quality images relevant to the services provided

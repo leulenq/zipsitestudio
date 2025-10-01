@@ -1,10 +1,11 @@
 use client;
-import AboutSection from '../../../components/AboutSection';
 
-export default function About() {
+export default function AboutPage() {
   return (
     <>
-      <AboutSection />
+      <h1>About us</h1>
+      <p>We are a team of professionals dedicated to providing high-quality services.</p>
+      <p>Our team consists of experienced individuals with a passion for their work.</p>
     </>
   );
 }
