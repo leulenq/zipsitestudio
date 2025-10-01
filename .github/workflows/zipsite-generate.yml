@@ -49,6 +49,10 @@ jobs:
           node scripts/gen-pages.js
           mkdir -p components
 
+      # --- NEW STEP ADDED BELOW ---
+      - name: Auto-Fix Generated Code
+        run: node scripts/fix-code.js
+
       - name: Install AI-Generated Dependencies
         run: |
           if [ -f "dependencies.json" ]; then
@@ -67,22 +71,6 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: node scripts/qa-agent.js
-
-      # --- NEW STEPS ADDED BELOW ---
-      - name: Check QA Report for Issues
-        id: qa_check
-        run: |
-          if jq -e '.issues_found == true' plan/qa-report.json; then
-            echo "issues_found=true" >> $GITHUB_OUTPUT
-          else
-            echo "issues_found=false" >> $GITHUB_OUTPUT
-          fi
-          
-      - name: Run Fixer Agent (if issues found)
-        if: steps.qa_check.outputs.issues_found == 'true'
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: node scripts/fixer-agent.js
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
