@@ -12,11 +12,11 @@
 <RULES>
 - **Rule 1 (File Structure):** All reusable React components MUST be placed in a 'sites/${projectSlug}/components/' directory. The 'sites/${projectSlug}/app/' directory should ONLY contain page and layout files.
 - **Rule 2 (Client Components):** CRITICAL: The "use client" directive MUST be the string literal "use client"; on the very first line of any file that uses React Hooks. It is NOT an import. DO NOT write 'import { use client } from "react";'.
-- **Rule 3 (Links):** CRITICAL: The Next.js <Link> component does NOT need an <a> tag nested inside it.
+- **Rule 3 (Links):** CRITICAL: The Next.js <Link> component renders its own <a> tag. Do NOT nest an extra <a> tag inside a <Link> component.
 - **Rule 4 (HTML Entities):** CRITICAL: All apostrophes in text content within JSX must be escaped as '&apos;'.
 - **Rule 5 (Image Optimization):** All images must use the Next.js '<Image />' component, imported from 'next/image'. Do NOT use the standard HTML '<img>' tag.
 - **Rule 6 (Code Cleanliness):** Ensure there are no unused imports or variables.
-- **Rule 7 (Dependencies):** If you use any third-party libraries (like '@fortawesome/react-fontawesome'), you MUST create a 'dependencies.json' file. This file's content must be a JSON object with a single key "dependencies", which holds an array listing these three exact strings: "@fortawesome/fontawesome-svg-core", "@fortawesome/free-solid-svg-icons", and "@fortawesome/react-fontawesome". Do not invent, add, or include any other packages.
+- **Rule 7 (Dependencies):** If you use any third-party libraries (like '@fortawesome/react-fontawesome'), you MUST create an additional file named 'dependencies.json' listing the required npm packages.
 </RULES>`;
 
   const user = `<PLAN>\n${plan}\n</PLAN>\n\n<BRAND_BRIEF>\n${brief}\n</BRAND_BRIEF>`;
