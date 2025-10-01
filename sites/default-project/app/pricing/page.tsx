@@ -1,11 +1,10 @@
 use client;
-import PricingTable from '../components/PricingTable';
+import PricingSection from '../../../components/PricingSection';
 
-export default function PricingPage() {
+export default function Pricing() {
   return (
-    <section>
-      <h1>Pricing Plans</h1>
-      <PricingTable />
-    </section>
+    <>
+      <PricingSection />
+    </>
   );
 }
