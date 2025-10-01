@@ -1,10 +1,11 @@
 use client;
+import { Image } from 'next/image';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
   return (
     <footer>
-      <p>&copy; {currentYear} Default Project</p>
+      <Image src="/logo.png" alt="Logo" width={50} height={50} />
+      &copy; 2024
     </footer>
   );
 }

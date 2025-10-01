@@ -1,10 +1,17 @@
 use client;
+import { Link } from 'next/navigation';
+import CallToActionButton from '../../../components/CallToActionButton';
+import HeroSection from '../../../components/HeroSection';
 
 export default function Home() {
   return (
-    <section>
-      <h1>Welcome to Default Project</h1>
-      <p>This is the home page.</p>
-    </section>
+    <>
+      <HeroSection />
+      <Link href="services">Services</Link>
+      <Link href="about">About</Link>
+      <Link href="contact">Contact</Link>
+      <Link href="pricing">Pricing</Link>
+      <CallToActionButton text='Get Started' />
+    </>
   );
 }

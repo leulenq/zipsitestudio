@@ -1,11 +1,12 @@
 use client;
-import ContactForm from '../components/ContactForm';
+import ContactSection from '../../../components/ContactSection';
+import ContactForm from '../../../components/ContactForm';
 
-export default function ContactPage() {
+export default function Contact() {
   return (
-    <section>
-      <h1>Get in Touch</h1>
+    <>
+      <ContactSection />
       <ContactForm />
-    </section>
+    </>
   );
 }
