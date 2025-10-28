@@ -1,11 +1,14 @@
 # Brand Brief
 ## Brand Voice
-* Professional and friendly, assuming a standard tone due to lack of information
+- Professional
+- Friendly
 ## Brand Tone
-* Approachable and helpful
+- Approachable
+- Expert
 ## Color Palette
-* Primary Color: #3498db
-* Secondary Color: #f1c40f
+- Primary color: #3498db
+- Secondary color: #f1c40f
 ## Imagery Guidance
-* Use high-quality, relevant images
-* Opt for a consistent visual style throughout the site
+- Use high-quality images
+- Opt for minimalistic backgrounds
+- Incorporate abstract shapes and patterns
